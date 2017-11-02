@@ -10,15 +10,9 @@ if ($mysqli->connect_error) {
 }
 $string='';
 
-//$main = curl("http://localmart.by/");
-
-//preg_match_all('% href="http://localmart\.by/(.+)/" class="title"%', $main, $matches, PREG_PATTERN_ORDER, 0);
-
-$matches[1] = Array('elektronika','odezhda_i_obuv','tovary_dlja_detej','zhivotnye','mobilnaja_svjaz','kompjutery'/*,'stroitelstvo_i_remont','vsjo_dlja_doma','nedvizhimost'*/);
+$matches[1] = Array('elektronika','odezhda_i_obuv','tovary_dlja_detej','zhivotnye','mobilnaja_svjaz','kompjutery','stroitelstvo_i_remont','vsjo_dlja_doma','nedvizhimost','cd-dvd','avto_moto','business','vsjo_dlja_ofisa','knigi','krasota_i_zdorove','muzyka','podarki_i_suveniry','rabota','sport_i_turizm','sredstva_svjazi','uslugi');
 
 
-
-//$matches[1][]='';
 print_r($matches);
 
 
@@ -36,16 +30,15 @@ if(end($mass_unix)>time()-2000){
 	}
 	foreach($links[1] as $k=>$dat){
 		$esc_url = $mysqli->real_escape_string($dat);
-		//$esc_unix = $mysqli->real_escape_string($mass_unix[$k]);
-		$dmy=date('Y-m-d H:i:s',$mass_unix[$k]);  // проверить возможность вставлять юникс
+		$dmy=date('Y-m-d H:i:s',$mass_unix[$k]);  // дата
 		$esc_dmy = $mysqli->real_escape_string($dmy);
-		$string.="INSERT INTO urls(url,date) SELECT '{$esc_url}','{$esc_dmy}' FROM urls WHERE NOT EXISTS (SELECT 1 FROM urls WHERE url = '{$esc_url}' LIMIT 1) LIMIT 1;"; //добавление с проверкой
+		$string.="INSERT INTO urls(url,date) SELECT '{$esc_url}','{$esc_dmy}' FROM urls WHERE NOT EXISTS (SELECT 1 FROM urls WHERE url = '{$esc_url}' LIMIT 1) LIMIT 1;"; //обновление
 	}
 }
 }
 $start_write=microtime(true);
 	$mysqli->multi_query($string);
-	printf("Errormessage: %s\n", $mysqli->error);
+	if ($mysqli->error) printf("Errormessage: %s\n", $mysqli->error);
 	$mysqli->close();
 $time_write=(microtime(true)-$start_write)*1000;
 echo "<br> запись в БД выполнялась $time_write милисекунд";
