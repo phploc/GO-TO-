@@ -1,19 +1,20 @@
 <?php
 //|||||||||||||||||||||
-define('OUTDIR','F:\OpenServer\domains\enlightenment.loc\fold');	//передаваемая папка
-define('DELDIR','F:\OpenServer');									//удаляемый путь 
-define('YAND_WAL','/backuper');										//папка в облаке в которую будет производиться запись
-define('SEPAR','\\');										//изначальный разделитель директорий
+
+$outdir='F:\OpenServer\domains\enlightenment.loc\fold';		//передаваемая папка
+$deldir='F:\OpenServer';									//удаляемый путь 
+$yand_wal='/backuper';										//папка в облаке в которую будет производиться запись
+$separ='\\';												//изначальный разделитель директорий
 
 						
 $cloud_auth='php.loc:fuckyou1';			//логин и пароль от облака							
 $time_out=10;							//CURLOPT_CONNECTTIMEOUT (Количество секунд ожидания при попытке соединения. Используйте 0 для бесконечного ожидания.)
 
-$obj = new yandex_disk("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out);
+$obj = new yandex_disk($deldir,$yand_wal,$separ,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out);
 $obj->other_params($cloud_auth);
 
 $results = array('file'=>array(),'dir'=>array() );
-$array=$obj->getDirContents(OUTDIR);						//получения массита адресов папок и файлов
+$array=$obj->getDirContents($outdir);						//получения массита адресов папок и файлов
 
 $string_result='';
 foreach($array as $value){
@@ -29,13 +30,19 @@ file_put_contents('log_yandex.txt',$string_result,FILE_APPEND);
 class cURL_lib {
 
 	private $ch;
+	public $deldir,$yand_wal,$separ;
 	
-	public function __construct($ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out=30){
+	public function __construct($deldir='F:\OpenServer',$yand_wal='/backuper',$separ='\\',$ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out=30){
 		$this->ch = curl_init();						//инициализация curl (основные параметры)
 		curl_setopt($this->ch, CURLOPT_HEADER, false); 
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $time_out);
-		curl_setopt($this->ch, CURLOPT_USERAGENT, $ua);		
+		curl_setopt($this->ch, CURLOPT_USERAGENT, $ua);
+
+		
+		$this->deldir=$deldir;
+		$this->yand_wal=$yand_wal;
+		$this->separ=$separ;
 	}
 	
 	public function other_params($auth=''){				//логин и пароль для входа
@@ -93,7 +100,8 @@ class yandex_disk extends cURL_lib{
 	public function getDirContents($dir, &$results = array('file'=>array(),'dir'=>array()) ){			//записывает в массив results все файлы и папки в папке dir
 		$files = scandir($dir);
 		$results['dir'][] =$dir;
-		$this->folders($dir.SEPAR);
+		$this->folders($dir.$this->separ);
+		
 		foreach($files as $key => $value){
 			$path = realpath($dir.DIRECTORY_SEPARATOR.$value);
 			if(!is_dir($path)) {
@@ -108,10 +116,10 @@ class yandex_disk extends cURL_lib{
 	
 	
 	public function folders($path){
-		$dir=mb_strrchr($path,SEPAR,true);
-		$st=explode(SEPAR,$dir);			//раздеитель директорий
+		$dir=mb_strrchr($path,$this->separ,true);
+		$st=explode($this->separ,$dir);			//раздеитель директорий
 		$n=count($st);
-		$adres=YAND_WAL;
+		$adres=$this->yand_wal;
 		for($i=2;$i<=$n;++$i){
 			$answ1=$this->chek_fold($adres);					//проверка наличия папки
 			file_put_contents('log_yandex.txt','chek_fold?='.$answ1['http_code'].PHP_EOL,FILE_APPEND);
@@ -124,8 +132,8 @@ class yandex_disk extends cURL_lib{
 	}
 	
 	public function file_wri($file_path_str){
-		$len = mb_strlen(DELDIR);				//колличество символов для удаления начала пути		
-		$yand_walk=YAND_WAL.mb_substr($file_path_str, $len);//запись файлов в соответствии с их адресом
+		$len = mb_strlen($this->deldir);				//колличество символов для удаления начала пути		
+		$yand_walk=$this->yand_wal.mb_substr($file_path_str, $len);//запись файлов в соответствии с их адресом
 		$yand_walk= str_replace('\\','/', $yand_walk);
 		$result=$this->write_file($file_path_str,$yand_walk);
 		file_put_contents('log_yandex.txt','write_file&='.$result['http_code'].PHP_EOL,FILE_APPEND);
