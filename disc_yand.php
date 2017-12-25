@@ -3,7 +3,7 @@
 
 $outdir='F:\OpenServer\domains\enlightenment.loc\fold';		//передаваемая папка
 $deldir='F:\OpenServer';									//удаляемый путь 
-$yand_wal='/backuper';										//папка в облаке в которую будет производиться запись
+$yand_wal='/bacuper';										//папка в облаке в которую будет производиться запись
 $separ='\\';												//изначальный разделитель директорий
 
 						
@@ -32,17 +32,13 @@ class cURL_lib {
 	private $ch;
 	public $deldir,$yand_wal,$separ;
 	
-	public function __construct($deldir='F:\OpenServer',$yand_wal='/backuper',$separ='\\',$ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out=30){
+	public function __construct($ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out=30){
 		$this->ch = curl_init();						//инициализация curl (основные параметры)
 		curl_setopt($this->ch, CURLOPT_HEADER, false); 
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $time_out);
 		curl_setopt($this->ch, CURLOPT_USERAGENT, $ua);
 
-		
-		$this->deldir=$deldir;
-		$this->yand_wal=$yand_wal;
-		$this->separ=$separ;
 	}
 	
 	public function other_params($auth=''){				//логин и пароль для входа
@@ -96,6 +92,12 @@ class yandex_disk extends cURL_lib{
 	
 	const CLOUD = 'https://webdav.yandex.ru';		//адрес облака
 	
+	public function __construct($deldir='F:\OpenServer',$yand_wal='/backuper',$separ='\\',$ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36",$time_out=30){
+		$this->deldir=$deldir;
+		$this->yand_wal=$yand_wal;
+		$this->separ=$separ;
+		parent::__construct($ua,$time_out);
+	}
 	
 	public function getDirContents($dir, &$results = array('file'=>array(),'dir'=>array()) ){			//записывает в массив results все файлы и папки в папке dir
 		$files = scandir($dir);
