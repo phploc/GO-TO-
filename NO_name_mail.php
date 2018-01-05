@@ -1,14 +1,16 @@
 <?php
 header('Content-Type: text/html; charset=utf-8', true);
 $encoding = "utf-8";
-//$mail_to='check-auth-bestbox95=gmail.com@verifier.port25.com';
-//$mail_to='bestbox95@gmail.com';
-$mail_to='test-27b82171@appmaildev.com';
-$mail_subject='theme';
 
-$mail_message='hello\r\n';
-$from_name='fg';
-$from_mail='admin@circense.ru';
+$mail_to='s.shurchkov@yandex.ru';  //адрес получателя письма
+
+$mail_subject='Срочна';			// тема письма
+
+$mail_message='Мiкiта вы знайшлi Мiкалая?';  //сообщение в письме
+$from_name='fg';							//имя отправителя
+$from_mail='admin@circense.ru';				//указать адрес отправителя
+$reply='bestbox95@bk.ru'; 					//адрес пересылки
+
     // Preferences for Subject field
     $subject_preferences = array(
         "input-charset" => $encoding,
@@ -19,7 +21,8 @@ $from_mail='admin@circense.ru';
 
     // Mail header
     $header = "Content-type: text/html; charset=".$encoding." \r\n";
-    $header .= "From: ".$from_name." <".$from_mail."> \r\n";
+    $header .= "From: $from_name  <$from_mail> \r\n";
+    $header .= "Reply-To: $reply\r\n";
     $header .= "MIME-Version: 1.0 \r\n";
     $header .= "Content-Transfer-Encoding: 8bit \r\n";
     $header .= "Date: ".date("r (T)")." \r\n";
