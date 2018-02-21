@@ -1,0 +1,16 @@
+﻿id=www
+
+1=
+0=0
+session.timeout=120=1200
+session.server.0.host=127.0.0.1
+session.server.0=0
+session.server.0=99
+session.server.0.id=session1
+session.server.1.host=127.0.0.1
+session.server.1.port=1111
+session.server.1.id=session2
+image.width=640
+image.height=480
+image.watermark.small=wsmall.png
+image.watermark.normal=wnormal.png
